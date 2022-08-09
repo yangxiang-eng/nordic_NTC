@@ -58,13 +58,13 @@
 #include "nrf_sdh_ble.h"
 #include "boards.h"
 #include "app_timer.h"
-//#include "app_button.h"
 #include "ble_lbs.h"
 #include "nrf_ble_gatt.h"
 #include "nrf_ble_qwr.h"
 #include "nrf_pwr_mgmt.h"
 #include "AccMgr.h"
 #include "ohm3_driver.h"
+#include "battery_measure.h"
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -73,15 +73,20 @@
 
 #include "bsp_button.h"
 
-//ADC AND TEMP 
+//判断是否启动采集电压
+extern bool  TEMP_ADC_POWER_ON ; 
 
+extern bool BATTERY_POWER_ON ; 
+
+//ADC AND TEMP 
+#ifndef TEMP_FRON_SHT
 #include "temp_adc.h"
 
 #include "stroge_data.h"
-
-//#include "sensor_sht.h"
-//#include "sht4x_i2c.h"
-
+#else
+#include "sensor_sht.h"
+#include "sht4x_i2c.h"
+#endif
 
 #define ADVERTISING_LED                 BSP_BOARD_LED_0                         /**< Is on when device is advertising. */
 #define CONNECTED_LED                   BSP_BOARD_LED_1                         /**< Is on when device has connected. */
@@ -115,7 +120,18 @@ BLE_LBS_DEF(m_lbs);                                                             
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);     
 
+
 APP_TIMER_DEF(m_measure_temperature_timer);                                                     /**< Context for the Queued Write module.*/
+
+APP_TIMER_DEF(m_measure_skip_temperature_timer);
+
+
+
+APP_TIMER_DEF(m_measure_batter_timer);
+
+
+APP_TIMER_DEF(m_measure_skip_batter_timer);
+
 
 APP_TIMER_DEF(m_led_timer_id);
 
@@ -125,6 +141,7 @@ static uint8_t m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;                   
 static uint8_t m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];                    /**< Buffer for storing an encoded advertising set. */
 static uint8_t m_enc_scan_response_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX];         /**< Buffer for storing an encoded scan data. */
 static void period_measure_timer_handler(void* p);
+static void period_measure_timer_skip_handler(void* p);
 /**@brief Struct that contains pointers to the encoded advertising data. */
 static ble_gap_adv_data_t m_adv_data =
 {
@@ -177,12 +194,47 @@ static void leds_init(void)
  *
  * @details Initializes the timer module.
  */
+
+static void batter_handler(void* p)
+{
+  if(!TEMP_ADC_POWER_ON)
+  {
+    battery_measure_period_call(); //启动电池电量采集
+    app_timer_start(m_measure_batter_timer,APP_TIMER_TICKS(21000),NULL);
+  }
+  else
+  {
+    app_timer_start(m_measure_skip_batter_timer,APP_TIMER_TICKS(100),NULL);
+  }
+}
+
+static void batter_skip_handler(void* p)
+{
+  if(!TEMP_ADC_POWER_ON)
+  {
+    app_timer_start(m_measure_batter_timer,APP_TIMER_TICKS(21000),NULL);
+  }
+  else
+  {
+    app_timer_start(m_measure_skip_batter_timer,APP_TIMER_TICKS(100),NULL);
+  }
+}
 static void timers_init(void)
 {
     // Initialize timer module, making it use the scheduler
     ret_code_t err_code = app_timer_init();
     err_code = app_timer_create(&m_measure_temperature_timer,\
                                 APP_TIMER_MODE_SINGLE_SHOT, period_measure_timer_handler);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = app_timer_create(&m_measure_batter_timer,APP_TIMER_MODE_SINGLE_SHOT,batter_handler);
+
+    APP_ERROR_CHECK(err_code);
+
+    err_code = app_timer_create(&m_measure_skip_batter_timer,APP_TIMER_MODE_SINGLE_SHOT,batter_skip_handler);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = app_timer_create(&m_measure_skip_temperature_timer, APP_TIMER_MODE_SINGLE_SHOT, period_measure_timer_skip_handler);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -485,7 +537,11 @@ static void buttons_init(void)
 #define INVALID_TEMP_VALUE -100
 float adcCurrentTemp = INVALID_TEMP_VALUE;
 float adcAvgTemp = INVALID_TEMP_VALUE;
+float shtTemp = INVALID_TEMP_VALUE ; 
 int16_t adcEddystoneAdvTemp = 0;
+
+uint16_t batter_data ; 
+
 int avgADC = INVALID_TEMP_VALUE ;
 
 static void log_init(void)
@@ -521,40 +577,100 @@ static void idle_state_handle(void)
 
 static void period_measure_timer_handler(void* p)
 {
+    if(BATTERY_POWER_ON)
+    {
+      app_timer_start(m_measure_skip_temperature_timer,APP_TIMER_TICKS(100),NULL);
+    }
+    else
+    {
+      adcCurrentTemp =INVALID_TEMP_VALUE;
+      adcAvgTemp = INVALID_TEMP_VALUE ; 
+
+      #ifndef TEMP_FRON_SHT
+      Temp_startMeasure();
+      #else
+      HT_startMeasure();
+      #endif
+      app_timer_start(m_measure_temperature_timer, APP_TIMER_TICKS(5000), NULL);
+    }
+}
+
+static void period_measure_timer_skip_handler(void* p)
+{
+  if(BATTERY_POWER_ON)
+  {
+    app_timer_start(m_measure_skip_temperature_timer,APP_TIMER_TICKS(100),NULL);
+  }
+  else
+  {
     adcCurrentTemp =INVALID_TEMP_VALUE;
     adcAvgTemp = INVALID_TEMP_VALUE ; 
 
-    
+    #ifndef TEMP_FRON_SHT
     Temp_startMeasure();
-
-
-    
+    #else
+    HT_startMeasure();
+    #endif
     app_timer_start(m_measure_temperature_timer, APP_TIMER_TICKS(5000), NULL);
+  }
 }
 
 static void check_print(void)
 {
+#ifndef TEMP_FRON_SHT
   if (adcAvgTemp != INVALID_TEMP_VALUE)
   {
     NRF_LOG_INFO("adcAvgTemp:%d\t avgadc:%d\t ",(int)(adcAvgTemp*100),avgADC);
    
    
   }
+ #else
+  if(shtTemp != INVALID_TEMP_VALUE)
+  {
+    NRF_LOG_INFO("shtTemp:%d\t",(int)(shtTemp*100));
+  }
+ #endif
 }
-
+#ifndef TEMP_FRON_SHT
 void temp_measure_callback(ETempMeasureResult result, float currentTemp, float averageTemp,int avgadc)
 {
     if (TEMP_MEASURE_SUCCESS == result)
     {
       adcAvgTemp = averageTemp;
-    
+      //adcAvgTemp = -10.02 ; 
       adcEddystoneAdvTemp = (int16_t)(averageTemp * 256);
-
       adcCurrentTemp = currentTemp;
       avgADC = avgadc ; 
       check_print();
     }
 
+}
+#else
+void sensor_callback(int err, float temp , float hum)
+{
+    if(0==err)
+    {
+       shtTemp = temp;
+       adcEddystoneAdvTemp =(int16_t)(temp*256);
+
+       //int16_t ans = -1.68 * 255 ; 
+       //adcEddystoneAdvTemp = ans ; 
+       //NRF_LOG_INFO("adcEddystoneAdvTemp:%d\n",adcEddystoneAdvTemp);
+       check_print();
+    }
+}
+#endif
+
+
+void batter_callback(battery_get_data result , uint16_t data)
+{
+  if(result == GET_DATA_SUCCUE)
+  {
+    //
+    //batter_data = (uint16_t)(data*256);
+    batter_data = data ; 
+    NRF_LOG_INFO("batter_data:%d\n",batter_data);
+  }
 }
 /**@brief Function for application main entry.
  */
@@ -581,7 +697,7 @@ int main(void)
 
     advertising_init();
 
-    // Start execution.
+     //Start execution.
     Acc_mgr_init();
 
     OHM_PosDetectEnable();
@@ -593,10 +709,14 @@ int main(void)
 
     //adc and temp 
     app_timer_start(m_measure_temperature_timer,APP_TIMER_TICKS(5000),NULL);
-
+#ifndef  TEMP_FRON_SHT
     Temp_Init(temp_measure_callback);
 
-
+    battery_measure_init(batter_callback);
+    app_timer_start(m_measure_batter_timer,APP_TIMER_TICKS(21000),NULL);
+#else
+    HT_Init(sensor_callback);
+#endif
     // Enter main loop.
     for (;;)
     {

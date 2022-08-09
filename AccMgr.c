@@ -12,10 +12,12 @@ static void acc_interrupt_callback(uint8_t event);
 
 
 
-
+#ifndef TEMP_FRON_SHT
 static const nrf_drv_twi_t i2c_instance = NRF_DRV_TWI_INSTANCE(0);
 //static const nrf_drv_twi_t i2c_instance = NRFX_TWIM_INSTANCE(0);
-
+#else
+static const nrf_drv_twi_t i2c_instance = NRF_DRV_TWI_INSTANCE(1);
+#endif
 /**
  * Initialize all hard- and software components that are needed for the I2C
  * communication.
@@ -87,7 +89,7 @@ static void acc_interrupt_callback(uint8_t event)
 
 uint8_t Acc_ReadReg(uint8_t addr, uint8_t *buf)
 {
-    uint32_t err_code = 0;
+    ret_code_t err_code = 0;
     uint8_t readAddr[] = {addr};
 
     err_code = nrf_drv_twi_tx(&i2c_instance, OHM_ADDR_READ, readAddr, 1, true);
@@ -103,7 +105,7 @@ uint8_t Acc_WriteReg(uint8_t addr, uint8_t buf)
 {
     uint8_t txBuf[] = {addr, buf};
 
-    uint32_t err_code = nrf_drv_twi_tx(&i2c_instance, OHM_ADDR_READ, txBuf, sizeof(txBuf), true);
+    ret_code_t err_code = nrf_drv_twi_tx(&i2c_instance, OHM_ADDR_READ, txBuf, sizeof(txBuf), true);
     APP_ERROR_CHECK(err_code);
 
     return true;

@@ -131,16 +131,19 @@ ret_code_t advertising_init(void)
 
 //update advertisement content
 extern int16_t adcEddystoneAdvTemp;
+extern uint16_t batter_data ; 
+
 static void advertising_update_adv_data(void)
 {
     uint16_t batt;
 
     // Battery voltage (bit 10:8 - integer, but 7:0 fraction)
     batt = 3000;
-    kBeaconAdv.vBatt[0] = HI_UINT16(batt);
-    kBeaconAdv.vBatt[1] = LO_UINT16(batt);
+    kBeaconAdv.vBatt[0] =(batter_data >>8);
+    kBeaconAdv.vBatt[1] =(batter_data & 0xFF);
 
     // Temperature - 19.5 (Celcius) for example
+
     kBeaconAdv.temp[0]  = (adcEddystoneAdvTemp >> 8);
     kBeaconAdv.temp[1]  = (adcEddystoneAdvTemp & 0xFF) ;
 

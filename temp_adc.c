@@ -1,8 +1,11 @@
+#ifndef TEMP_FRON_SHT
 #include "temp_adc.h"
 #include "nrf_drv_saadc.h"
 #include "app_timer.h"
 #include "nrf_log.h"
 #include "stroge_data.h"
+
+bool TEMP_ADC_POWER_ON = false ; 
 
 //基于时间缓冲区队列
 #define MAX_TIME_FILTER_NUM 4
@@ -83,7 +86,7 @@ static int append_2_time_filter(int currentRate)
             totalRecordNum++;
         }
     }
-    if (totalRecordNum > 0)
+    if (totalRecordNum > 0 )
     {
         return totalRecordRate / totalRecordNum;
     }
@@ -194,6 +197,7 @@ static void saadc_driver_start(void)
     APP_ERROR_CHECK(err_code);
 
     gap_shot_data_num = 0;
+    TEMP_ADC_POWER_ON = true ; //表示启动采样
     nrf_drv_saadc_sample();
 }
 
@@ -208,6 +212,7 @@ static void saadc_driver_stop(void)
     //power off adc
     nrf_gpio_pin_set(TP_POWER_SWITCH);
     gap_shot_data_num = 0;
+    TEMP_ADC_POWER_ON = false ; //表示停止采样
 }
 
 static void measure_delay_timer_handler(void*p)
@@ -270,3 +275,5 @@ void Temp_SensorStop(void)
     clear_time_filter();
     nrf_gpio_pin_set(TP_POWER_SWITCH);
 }
+
+#endif

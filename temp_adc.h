@@ -1,3 +1,4 @@
+#ifndef TEMP_FRON_SHT
 #ifndef TEMP_ADC_H
 #define TEMP_ADC_H
 #include <stdint.h>
@@ -30,4 +31,5 @@ uint32_t Temp_startMeasure(void);
 void Temp_SensorStop(void);
 
 
+#endif
 #endif
