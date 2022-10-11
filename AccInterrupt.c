@@ -1,3 +1,4 @@
+#ifdef  LIS2DW_XYZ
 #if ACC_SENSOR_ENABLE
 #include "AccInterrupt.h"
 #include "nrf_gpio.h"
@@ -87,4 +88,5 @@ void Acc_interrupt_init(acc_interrupt_evt accEvtCallback)
         
 }
 
+#endif
 #endif

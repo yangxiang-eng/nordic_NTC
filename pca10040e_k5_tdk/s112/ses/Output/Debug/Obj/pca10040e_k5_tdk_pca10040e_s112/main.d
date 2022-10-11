@@ -91,9 +91,6 @@ Output/Debug/Obj/pca10040e_k5_tdk_pca10040e_s112/main.o: \
  ../../../../../../components/ble/nrf_ble_gatt/nrf_ble_gatt.h \
  ../../../../../../components/ble/nrf_ble_qwr/nrf_ble_qwr.h \
  ../../../../../../components/libraries/pwr_mgmt/nrf_pwr_mgmt.h \
- D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\AccMgr.h \
- D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\ohm3_driver.h \
- D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\battery_measure.h \
  ../../../../../../components/libraries/log/nrf_log.h \
  ../../../../../../components/libraries/strerror/nrf_strerror.h \
  ../../../../../../components/libraries/log/src/nrf_log_internal.h \
@@ -106,6 +103,14 @@ Output/Debug/Obj/pca10040e_k5_tdk_pca10040e_s112/main.o: \
  ../../../../../../components/libraries/balloc/nrf_balloc.h \
  ../../../../../../components/libraries/log/nrf_log_default_backends.h \
  D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\advertiser.h \
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\lis2dw.h \
  D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\bsp_button.h \
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\AccMgr.h \
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\AccInterrupt.h \
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\ohm3_driver.h \
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\battery_measure.h \
  D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\temp_adc.h \
- D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\stroge_data.h
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\stroge_data.h \
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\sensor_sht.h \
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\sht4x_i2c.h \
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\sensirion_config.h

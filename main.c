@@ -58,41 +58,48 @@
 #include "nrf_sdh_ble.h"
 #include "boards.h"
 #include "app_timer.h"
+#include "app_button.h"
 #include "ble_lbs.h"
 #include "nrf_ble_gatt.h"
 #include "nrf_ble_qwr.h"
 #include "nrf_pwr_mgmt.h"
-#include "AccMgr.h"
-#include "ohm3_driver.h"
-#include "battery_measure.h"
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 #include "advertiser.h"
-
+#include "lis2dw.h"
 #include "bsp_button.h"
+#include "AccMgr.h"
+#include "AccInterrupt.h"
+#include "advertiser.h"
+#include "ads1115.h"
+#include "stroge_data.h"
 
+//#ifdef  LIS2DW_XYZ
+
+#include "ohm3_driver.h"
+#include "battery_measure.h"
 //判断是否启动采集电压
 extern bool  TEMP_ADC_POWER_ON ; 
 
 extern bool BATTERY_POWER_ON ; 
 
 //ADC AND TEMP 
-#ifndef TEMP_FRON_SHT
+
 #include "temp_adc.h"
 
 #include "stroge_data.h"
-#else
+
 #include "sensor_sht.h"
 #include "sht4x_i2c.h"
-#endif
+
 
 #define ADVERTISING_LED                 BSP_BOARD_LED_0                         /**< Is on when device is advertising. */
 #define CONNECTED_LED                   BSP_BOARD_LED_1                         /**< Is on when device has connected. */
 #define LEDBUTTON_LED                   BSP_BOARD_LED_2                         /**< LED to be toggled with the help of the LED Button Service. */
 #define LEDBUTTON_BUTTON                BSP_BUTTON_0                            /**< Button that will trigger the notification event with the LED Button Service */
-
+#define LIS2DW_LED                      BSP_LED_0 
 #define DEVICE_NAME                     "Nordic_Blinky"                         /**< Name of device. Will be included in the advertising data. */
 
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
@@ -115,10 +122,15 @@ extern bool BATTERY_POWER_ON ;
 
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
      
+//static ARW_XYZ gsp_data ;
+static float Temp_Data = 0.0 ;  
 
 BLE_LBS_DEF(m_lbs);                                                             /**< LED Button Service instance. */
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);     
+
+APP_TIMER_DEF(m_measure_lis2dw_timer);
+
 
 
 APP_TIMER_DEF(m_measure_temperature_timer);                                                     /**< Context for the Queued Write module.*/
@@ -133,8 +145,9 @@ APP_TIMER_DEF(m_measure_batter_timer);
 APP_TIMER_DEF(m_measure_skip_batter_timer);
 
 
-APP_TIMER_DEF(m_led_timer_id);
+APP_TIMER_DEF(temp_adc_timer);
 
+APP_TIMER_DEF(m_led_timer_id);
 static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        /**< Handle of the current connection. */
 
 static uint8_t m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;                   /**< Advertising handle used to identify an advertising set. */
@@ -194,7 +207,7 @@ static void leds_init(void)
  *
  * @details Initializes the timer module.
  */
-
+#ifdef  LIS2DW_XYZ
 static void batter_handler(void* p)
 {
   if(!TEMP_ADC_POWER_ON)
@@ -219,22 +232,25 @@ static void batter_skip_handler(void* p)
     app_timer_start(m_measure_skip_batter_timer,APP_TIMER_TICKS(100),NULL);
   }
 }
+#endif
+
+int16_t adcEddystoneAdvTemp;
+int16_t adcEddystoneAdvRes ; 
+int16_t adceddystoneAdvZ , adceddystoneAdvY,adceddystoneAdvX ;
+
+static void temp_adc_timer_handler(void* p)
+{
+    Temp_startMeasure();
+    app_timer_start(temp_adc_timer,APP_TIMER_TICKS(2000),NULL);
+}
+
 static void timers_init(void)
 {
     // Initialize timer module, making it use the scheduler
     ret_code_t err_code = app_timer_init();
-    err_code = app_timer_create(&m_measure_temperature_timer,\
-                                APP_TIMER_MODE_SINGLE_SHOT, period_measure_timer_handler);
     APP_ERROR_CHECK(err_code);
-
-    err_code = app_timer_create(&m_measure_batter_timer,APP_TIMER_MODE_SINGLE_SHOT,batter_handler);
-
-    APP_ERROR_CHECK(err_code);
-
-    err_code = app_timer_create(&m_measure_skip_batter_timer,APP_TIMER_MODE_SINGLE_SHOT,batter_skip_handler);
-    APP_ERROR_CHECK(err_code);
-
-    err_code = app_timer_create(&m_measure_skip_temperature_timer, APP_TIMER_MODE_SINGLE_SHOT, period_measure_timer_skip_handler);
+    
+    app_timer_create(&temp_adc_timer,APP_TIMER_MODE_SINGLE_SHOT,temp_adc_timer_handler);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -403,7 +419,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
         case BLE_GAP_EVT_CONNECTED:
             NRF_LOG_INFO("Connected");
             //bsp_board_led_on(CONNECTED_LED);
-            bsp_board_led_off(ADVERTISING_LED);
+            //bsp_board_led_off(ADVERTISING_LED);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
             err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
             APP_ERROR_CHECK(err_code);
@@ -504,19 +520,19 @@ static void ble_stack_init(void)
 static void bsp_event_callback(bsp_event_t evt)
 {
     ret_code_t err_code;
-
+ 
     switch (evt)
     {
        case BSP_EVENT_KEY_0_PUSH:
-            NRF_LOG_INFO("Send button state change.");
-            bsp_board_led_on(CONNECTED_LED);
-            //定时器
-            app_timer_start(m_led_timer_id,APP_TIMER_TICKS(1000),NULL);
+            
+            NRF_LOG_INFO("button1 push\n");
+            //LIS2DW12_Get_Motion_Detection();
+            
             break;
 
        case BSP_EVENT_KEY_0_LONG_PUSH:
-            bsp_board_led_on(CONNECTED_LED);
-            app_timer_start(m_led_timer_id,APP_TIMER_TICKS(5000),NULL);
+           
+            NRF_LOG_INFO("BUTTON1 LONG push\n");
             break ; 
        case BSP_EVENT_KEY_0_PUSH_REL:
            break ; 
@@ -575,6 +591,7 @@ static void idle_state_handle(void)
     }
 }
 
+
 static void period_measure_timer_handler(void* p)
 {
     if(BATTERY_POWER_ON)
@@ -631,7 +648,9 @@ static void check_print(void)
   }
  #endif
 }
-#ifndef TEMP_FRON_SHT
+
+
+// result r temp r
 void temp_measure_callback(ETempMeasureResult result, float currentTemp, float averageTemp,int avgadc)
 {
     if (TEMP_MEASURE_SUCCESS == result)
@@ -639,27 +658,17 @@ void temp_measure_callback(ETempMeasureResult result, float currentTemp, float a
       adcAvgTemp = averageTemp;
       //adcAvgTemp = -10.02 ; 
       adcEddystoneAdvTemp = (int16_t)(averageTemp * 256);
+      adcEddystoneAdvRes = (int16_t)avgadc;
       adcCurrentTemp = currentTemp;
+      
       avgADC = avgadc ; 
+      int temp_value = (averageTemp - (int)averageTemp)*100 ; 
+      NRF_LOG_INFO("temp :%d.%02d ,r:%d\n",averageTemp,temp_value,avgadc);
       check_print();
     }
 
 }
-#else
-void sensor_callback(int err, float temp , float hum)
-{
-    if(0==err)
-    {
-       shtTemp = temp;
-       adcEddystoneAdvTemp =(int16_t)(temp*256);
 
-       //int16_t ans = -1.68 * 255 ; 
-       //adcEddystoneAdvTemp = ans ; 
-       //NRF_LOG_INFO("adcEddystoneAdvTemp:%d\n",adcEddystoneAdvTemp);
-       check_print();
-    }
-}
-#endif
 
 
 void batter_callback(battery_get_data result , uint16_t data)
@@ -672,10 +681,24 @@ void batter_callback(battery_get_data result , uint16_t data)
     NRF_LOG_INFO("batter_data:%d\n",batter_data);
   }
 }
+
+static void ads1115_callback_handler(uint16_t adc1 , uint16_t adc2)
+{
+  NRF_LOG_INFO("---------------------------");
+  NRF_LOG_INFO("adc1 %d, adc2 %d ",adc1,adc2);
+  float ans = (float)adc1 / (float)adc2;
+  NRF_LOG_INFO("ans data %d",ans*10000);
+  float temp = search_data(ans*10000);
+  int point_value = (temp - (int)temp)*100;
+  adcEddystoneAdvTemp = (int16_t)(temp * 256);
+  NRF_LOG_INFO("temp value : %d.%02d",temp,point_value);
+}
+
+
 /**@brief Function for application main entry.
  */
 int main(void)
-{
+         {
     // Initialize.
     log_init();
     leds_init();
@@ -696,28 +719,23 @@ int main(void)
     conn_params_init();
 
     advertising_init();
-
-     //Start execution.
-    Acc_mgr_init();
-
-    OHM_PosDetectEnable();
-    AxesRaw_t ax;
-    OHM_GetPosAxesRaw(&ax);
-
     NRF_LOG_INFO("Blinky example started.");
     advertising_start();
 
+  #ifdef  ASD1115
+  Acc_mgr_init();
+  ads1115_init(ads1115_callback_handler);
+  #endif
+  
+  //app_timer_start(m_measure_temperature_timer,APP_TIMER_TICKS(5000),NULL);  
+  #ifdef K6PB_DIF
     //adc and temp 
-    app_timer_start(m_measure_temperature_timer,APP_TIMER_TICKS(5000),NULL);
-#ifndef  TEMP_FRON_SHT
     Temp_Init(temp_measure_callback);
+    Temp_startMeasure();
+    app_timer_start(temp_adc_timer,APP_TIMER_TICKS(1000),NULL);
 
-    battery_measure_init(batter_callback);
-    app_timer_start(m_measure_batter_timer,APP_TIMER_TICKS(21000),NULL);
-#else
-    HT_Init(sensor_callback);
-#endif
-    // Enter main loop.
+    #endif
+
     for (;;)
     {
         idle_state_handle();

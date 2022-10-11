@@ -61,7 +61,11 @@ static bsp_event_callback_t   m_registered_callback         = NULL;
 static bsp_button_event_cfg_t m_events_list[BUTTONS_NUMBER] = {
     {BSP_EVENT_KEY_0_PUSH, BSP_EVENT_KEY_0_LONG_PUSH, BSP_EVENT_KEY_0_PUSH_REL}
 #ifdef BSP_BUTTON_1
-    ,{BSP_EVENT_KEY_1_PUSH, BSP_EVENT_NOTHING, BSP_EVENT_KEY_1_PUSH_REL}
+    ,{BSP_EVENT_KEY_1_PUSH, BSP_EVENT_KEY_1_LONG_PUSH, BSP_EVENT_KEY_1_PUSH_REL}
+#endif
+
+#ifdef BSP_BUTTON_2
+    ,{BSP_EVENT_KEY_2_PUSH, BSP_EVENT_KEY_2_LONG_PUSH, BSP_EVENT_KEY_2_PUSH_REL}
 #endif
     };
 

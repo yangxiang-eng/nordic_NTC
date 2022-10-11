@@ -120,7 +120,7 @@ ret_code_t advertising_init(void)
 
     //init radio event
     err_code = ble_radio_notification_init(APP_IRQ_PRIORITY_LOW,
-                                           NRF_RADIO_NOTIFICATION_DISTANCE_800US,
+                                           NRF_RADIO_NOTIFICATION_DISTANCE_5500US,
                                            ble_on_radio_active_evt);
     err_code = sd_radio_notification_cfg_set(NRF_RADIO_NOTIFICATION_TYPE_INT_ON_INACTIVE,
                NRF_RADIO_NOTIFICATION_DISTANCE_2680US);
@@ -131,27 +131,26 @@ ret_code_t advertising_init(void)
 
 //update advertisement content
 extern int16_t adcEddystoneAdvTemp;
-extern uint16_t batter_data ; 
-
+extern int16_t adcEddystoneAdvRes ; 
+#if  defined(BOARD_D62) || defined(K6p_NRF52XX) || defined (PCA1000_ADS1115)
 static void advertising_update_adv_data(void)
 {
     uint16_t batt;
 
     // Battery voltage (bit 10:8 - integer, but 7:0 fraction)
     batt = 3000;
-    kBeaconAdv.vBatt[0] =(batter_data >>8);
-    kBeaconAdv.vBatt[1] =(batter_data & 0xFF);
+    kBeaconAdv.vBatt[0] = HI_UINT16(batt);
+    kBeaconAdv.vBatt[1] = LO_UINT16(batt);
 
     // Temperature - 19.5 (Celcius) for example
-
     kBeaconAdv.temp[0]  = (adcEddystoneAdvTemp >> 8);
     kBeaconAdv.temp[1]  = (adcEddystoneAdvTemp & 0xFF) ;
 
     // advertise packet cnt;
     kBeaconAdv.advCnt[0] = BREAK_UINT32(gapTotalAdvNum, 3);
     kBeaconAdv.advCnt[1] = BREAK_UINT32(gapTotalAdvNum, 2);
-    kBeaconAdv.advCnt[2] = BREAK_UINT32(gapTotalAdvNum, 1);
-    kBeaconAdv.advCnt[3] = BREAK_UINT32(gapTotalAdvNum, 0);
+    kBeaconAdv.advCnt[2] = BREAK_UINT32(adcEddystoneAdvRes, 1);
+    kBeaconAdv.advCnt[3] = BREAK_UINT32(adcEddystoneAdvRes, 0);
 
     // running time
     uint32_t rtcCount = app_timer_cnt_get();
@@ -162,6 +161,39 @@ static void advertising_update_adv_data(void)
     kBeaconAdv.secCnt[2] = BREAK_UINT32(time100MiliSec, 1);
     kBeaconAdv.secCnt[3] = BREAK_UINT32(time100MiliSec, 0);
 }
+#elif 
+
+extern int16_t adceddystoneAdvZ , adceddystoneAdvY,adceddystoneAdvX ;
+static void advertising_update_adv_data(void)
+{
+    uint16_t batt;
+
+    // Battery voltage (bit 10:8 - integer, but 7:0 fraction)
+    batt = 3000;
+    kBeaconAdv.vBatt[0] = HI_UINT16(batt);
+    kBeaconAdv.vBatt[1] = LO_UINT16(batt);
+
+    // Temperature - 19.5 (Celcius) for example
+    kBeaconAdv.temp[0]  = (adcEddystoneAdvTemp >> 8);
+    kBeaconAdv.temp[1]  = (adcEddystoneAdvTemp & 0xFF) ;
+
+    kBeaconAdv.accXPos[0] = (adceddystoneAdvX >>8);
+    kBeaconAdv.accXPos[1] = (adceddystoneAdvX & 0xFF);
+
+    kBeaconAdv.accYpos[0] = (adceddystoneAdvY >>8);
+    kBeaconAdv.accYpos[1] = (adceddystoneAdvY &0xFF);
+
+    kBeaconAdv.accZPos[0] = (adceddystoneAdvZ >>8);
+    kBeaconAdv.accZPos[1] = (adceddystoneAdvZ &0xFF);
+
+}
+#endif
+#define SENSOR_TYPE_BATT_MASK 0x1
+#define SENSOR_TYPE_TEMP_MASK 0x2
+#define SENSOR_TYPE_HUM_MASK 0x4
+#define SENSOR_TYPE_ACC_MASK 0x8
+#define SENSOR_TYPE_CUTOFF_MASK 0x10
+#define SENSOR_TYPE_PIR_MASK 0x20
 
 //encode rawdata to BLE adv content
 static uint32_t advertising_encode_adv_data(void)
@@ -169,10 +201,14 @@ static uint32_t advertising_encode_adv_data(void)
     ble_advdata_t m_adv_data;
     ble_advdata_service_data_t m_srv_adv;
     ble_uuid_t    m_eddy_service_uuid;
-
+#if  defined(BOARD_D62) || defined(K6p_NRF52XX) || defined (PCA1000_ADS1115)
+    kBeaconAdv.frameType = 0x20 ; 
+    kBeaconAdv.version = 0 ; 
+    #else 
     //get adv content
-    kBeaconAdv.frameType = 0x20;
-    kBeaconAdv.version = 0;
+    kBeaconAdv.frameType = 0x21;
+    kBeaconAdv.sensorMask = SENSOR_TYPE_ACC_MASK | SENSOR_TYPE_BATT_MASK | SENSOR_TYPE_HUM_MASK | SENSOR_TYPE_TEMP_MASK;
+    #endif
     advertising_update_adv_data();
 
     /////////////////

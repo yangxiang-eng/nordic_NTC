@@ -60,6 +60,7 @@ typedef struct
 #define LO_UINT16(a) ((a) & 0xFF)
 #define BREAK_UINT32( var, ByteNum )  (uint8_t)((uint32_t)(((var) >>((ByteNum) * 8)) & 0x00FF))
 
+#if defined(BOARD_D62) || defined(K6p_NRF52XX) || defined (PCA1000_ADS1115)
 typedef struct
 {
     uint8_t   frameType;      // TLM
@@ -69,6 +70,23 @@ typedef struct
     uint8_t   advCnt[4];      // Adv count since power-up/reboot
     uint8_t   secCnt[4];      // Time since power-up/reboot
 } kBeaconAdvData_t;
+
+
+#elif 
+typedef struct
+{
+    uint8_t   frameType;      // TLM
+    uint8_t   version;        // 0x00 for now    
+    uint8_t   sensorMask;     //0bit: voltage; 1bit:temp  2bit: humidty; 3bit: acc
+    uint8_t   vBatt[2];       // Battery Voltage, 1mV/bit, Big Endian
+    uint8_t   temp[2];        // Temperature. Signed 8.8 fixed point
+    uint8_t   humidty[2];      // Adv count since power-up/reboot
+    uint8_t   accXPos[2];
+    uint8_t   accYpos[2];
+    uint8_t   accZPos[2];    
+} kBeaconAdvData_t;
+
+#endif
 
 #define RTC_2_MS(a)  ((a*125) >> (10 + APP_TIMER_CONFIG_RTC_FREQUENCY))
 

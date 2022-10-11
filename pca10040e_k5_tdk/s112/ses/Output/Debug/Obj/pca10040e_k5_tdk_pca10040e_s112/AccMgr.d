@@ -61,8 +61,7 @@ Output/Debug/Obj/pca10040e_k5_tdk_pca10040e_s112/AccMgr.o: \
  ../../../../../../components/boards/boards.h \
  ../../../../../../modules/nrfx/hal/nrf_gpio.h \
  ../../../../../../components/boards/pca10040_k5_tdk.h \
- D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\ohm3_driver.h \
- D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\AccInterrupt.h \
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\lis2dw.h \
  ../../../../../../components/libraries/log/nrf_log.h \
  ../../../../../../components/libraries/util/sdk_common.h \
  D\:/sse/include/string.h \
