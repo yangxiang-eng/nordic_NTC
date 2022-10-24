@@ -238,11 +238,11 @@ int16_t adcEddystoneAdvTemp;
 int16_t adcEddystoneAdvRes ; 
 int16_t adceddystoneAdvZ , adceddystoneAdvY,adceddystoneAdvX ;
 
-static void temp_adc_timer_handler(void* p)
-{
-    Temp_startMeasure();
-    app_timer_start(temp_adc_timer,APP_TIMER_TICKS(2000),NULL);
-}
+//static void temp_adc_timer_handler(void* p)
+//{
+//    Temp_startMeasure();
+//    app_timer_start(temp_adc_timer,APP_TIMER_TICKS(2000),NULL);
+//}
 
 static void timers_init(void)
 {
@@ -250,7 +250,7 @@ static void timers_init(void)
     ret_code_t err_code = app_timer_init();
     APP_ERROR_CHECK(err_code);
     
-    app_timer_create(&temp_adc_timer,APP_TIMER_MODE_SINGLE_SHOT,temp_adc_timer_handler);
+    //app_timer_create(&temp_adc_timer,APP_TIMER_MODE_SINGLE_SHOT,temp_adc_timer_handler);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -649,7 +649,7 @@ static void check_print(void)
  #endif
 }
 
-
+#if  defined(BOARD_D62) || defined (BOARD_KN5_V3) || defined(KN6_SINGLE_MOD)
 // result r temp r
 void temp_measure_callback(ETempMeasureResult result, float currentTemp, float averageTemp,int avgadc)
 {
@@ -668,7 +668,7 @@ void temp_measure_callback(ETempMeasureResult result, float currentTemp, float a
     }
 
 }
-
+#endif
 
 
 void batter_callback(battery_get_data result , uint16_t data)
@@ -682,23 +682,59 @@ void batter_callback(battery_get_data result , uint16_t data)
   }
 }
 
+#ifdef  SAD1115_DIF_mod
 static void ads1115_callback_handler(uint16_t adc1 , uint16_t adc2)
 {
   NRF_LOG_INFO("---------------------------");
-  NRF_LOG_INFO("adc1 %d, adc2 %d ",adc1,adc2);
-  float ans = (float)adc1 / (float)adc2;
-  NRF_LOG_INFO("ans data %d",ans*10000);
-  float temp = search_data(ans*10000);
-  int point_value = (temp - (int)temp)*100;
+  //NRF_LOG_INFO("adc1 %d, adc2 %d ",adc1,adc2);
+  float ans = (float)adc2 / (float)adc1;
+  
+  float temp = (float)search_data(ans*10000);
   adcEddystoneAdvTemp = (int16_t)(temp * 256);
-  NRF_LOG_INFO("temp value : %d.%02d",temp,point_value);
+
+
+  int point_value = (temp - (int)temp)*100;
+  if(point_value < 0 )
+  {
+    point_value *=-1;
+  }
+  NRF_LOG_INFO("temp value : %d.%02d",(int16_t)temp,point_value);
+
+
+  
+
+  float R = (float)adc1*100 / (float)adc2 ; 
+  int R_point = (R - (int)R)*100;
+  NRF_LOG_INFO("R :%d.%02d",R,R_point);
 }
+
+#endif
+
+
+#ifdef  BOARD_K5_SHT
+
+static void sensor_handler(int result , float temp , float hum)
+{
+  if(result ==0)
+  {
+    adcEddystoneAdvTemp = (int16_t)(temp * 256);
+    int point_value = (temp - (int)temp)*100;
+    NRF_LOG_INFO("sensor sht4x get data :%d.%02d",(int16_t)temp,point_value);
+
+  }
+  else 
+  {
+     NRF_LOG_INFO("sensor sht4x get data error\n");
+  }
+}
+
+#endif
 
 
 /**@brief Function for application main entry.
  */
 int main(void)
-         {
+ {
     // Initialize.
     log_init();
     leds_init();
@@ -720,21 +756,28 @@ int main(void)
 
     advertising_init();
     NRF_LOG_INFO("Blinky example started.");
+
+
     advertising_start();
 
-  #ifdef  ASD1115
+  #ifdef BOARD_K5_SHT
+  HT_Init(sensor_handler);
+  HT_startMeasure();
+  #endif
+    
+  #ifdef  SAD1115
   Acc_mgr_init();
   ads1115_init(ads1115_callback_handler);
   #endif
   
   //app_timer_start(m_measure_temperature_timer,APP_TIMER_TICKS(5000),NULL);  
-  #ifdef K6PB_DIF
+#if  defined(BOARD_D62) || defined (BOARD_KN5_V3) || defined(KN6_SINGLE_MOD)
     //adc and temp 
     Temp_Init(temp_measure_callback);
     Temp_startMeasure();
     app_timer_start(temp_adc_timer,APP_TIMER_TICKS(1000),NULL);
 
-    #endif
+   #endif
 
     for (;;)
     {

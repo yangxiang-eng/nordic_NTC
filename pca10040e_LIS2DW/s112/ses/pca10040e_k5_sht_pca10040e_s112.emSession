@@ -25,7 +25,6 @@
   <ProjectSessionItem path="pca10040e_k5_sht;pca10040e_k5_sht"/>
   <ProjectSessionItem path="pca10040e_k5_sht;pca10040e_k5_sht;Application"/>
   <ProjectSessionItem path="pca10040e_k5_sht;pca10040e_k5_sht;Board Definition"/>
-  <ProjectSessionItem path="pca10040e_k5_sht;pca10040e_k5_sht;nRF_Libraries"/>
  </Project>
  <Register1>
   <RegisterWindow visibleNodes="CPU - Current Context/r0;CPU - Current Context/r1;CPU - Current Context/r2;CPU - Current Context/r3;CPU - Current Context/r4;CPU - Current Context/r5;CPU - Current Context/r6;CPU - Current Context/r7;CPU - Current Context/r8;CPU - Current Context/r9;CPU - Current Context/r10;CPU - Current Context/r11;CPU - Current Context/r12;CPU - Current Context/sp(r13);CPU - Current Context/lr(r14);CPU - Current Context/pc(r15);CPU - Current Context/apsr;CPU/r0;CPU/r1;CPU/r2;CPU/r3;CPU/r4;CPU/r5;CPU/r6;CPU/r7;CPU/r8;CPU/r9;CPU/r10;CPU/r11;CPU/r12;CPU/sp(r13);CPU/lr(r14);CPU/pc(r15);CPU/xpsr;CPU/MSP;CPU/PSP;CPU/PRIMASK;CPU/BASEPRI;CPU/FAULTMASK;CPU/CONTROL;CPU/internal" binaryNodes="" asciiNodes="" openNodes="CPU - Current Context" name="pca10040e_k5_sht" decimalNodes="" octalNodes="" unsignedNodes=""/>
@@ -60,14 +59,14 @@
  <Files>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../AccInterrupt.c" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="41" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../bsp_button.c" selected="0" top="12" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="765" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../main.c" selected="0" top="745" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="10" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../AccMgr.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="765" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="733" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="7" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../AccMgr.h" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1664" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../config/sdk_config.h" selected="0" top="1652" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="436" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../lis2dw.c" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../bsp_button.h" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="43" useTextEdit="1" openedFrom="D:/zepyth/nRF5_SDK_17.0.2_d674dde/examples/ble_peripheral/ble_app_blinky_k5/lis2dw.c" useBinaryEdit="0" left="0" path="../../../lis2dw.h" selected="0" top="21" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="116" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../AccMgr.c" selected="0" top="82" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="278" useTextEdit="1" openedFrom="D:/zepyth/nRF5_SDK_17.0.2_d674dde/examples/ble_peripheral/ble_app_blinky_k5/main.c" useBinaryEdit="0" left="0" path="../../../advertiser.c" selected="1" top="246" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="75" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../AccMgr.c" selected="0" top="75" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="278" useTextEdit="1" openedFrom="D:/zepyth/nRF5_SDK_17.0.2_d674dde/examples/ble_peripheral/ble_app_blinky_k5/main.c" useBinaryEdit="0" left="0" path="../../../advertiser.c" selected="0" top="257" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="71" useTextEdit="1" openedFrom="D:/zepyth/nRF5_SDK_17.0.2_d674dde/examples/ble_peripheral/ble_app_blinky_k5/advertiser.c" useBinaryEdit="0" left="0" path="../../../advertiser.h" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="195" useTextEdit="1" openedFrom="D:/zepyth/nRF5_SDK_17.0.2_d674dde/examples/ble_peripheral/ble_app_blinky_k5/advertiser.c" useBinaryEdit="0" left="0" path="../../../../../../components/softdevice/s112/headers/ble_types.h" selected="0" top="172" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1560" useTextEdit="1" openedFrom="D:/zepyth/nRF5_SDK_17.0.2_d674dde/examples/ble_peripheral/ble_app_blinky_k5/advertiser.c" useBinaryEdit="0" left="0" path="../../../../../../components/softdevice/s112/headers/ble_gap.h" selected="0" top="1537" codecName="Default"/>

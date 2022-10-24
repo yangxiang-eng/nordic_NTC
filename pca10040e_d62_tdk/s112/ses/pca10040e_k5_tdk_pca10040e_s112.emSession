@@ -60,12 +60,12 @@
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="39" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../../../../components/boards/boards.c" selected="0" top="15" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="73" useTextEdit="1" openedFrom="D:/zepyth/nRF5_SDK_17.0.2_d674dde/components/boards/boards.c" useBinaryEdit="0" left="0" path="../../../../../../components/boards/boards.h" selected="0" top="54" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="D:/zepyth/nRF5_SDK_17.0.2_d674dde/components/boards/boards.h" useBinaryEdit="0" left="0" path="../../../../../../components/boards/pca10040_K5_tdk.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="686" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="608" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="49" y="659" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="624" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="80" useTextEdit="1" openedFrom="D:/zepyth/nRF5_SDK_17.0.2_d674dde/components/boards/boards.h" useBinaryEdit="0" left="0" path="../../../../../../components/boards/pca10040_D62_tdk.h" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="60" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../advertiser.h" selected="0" top="51" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="152" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../advertiser.c" selected="0" top="133" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="91" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../AccInterrupt.c" selected="0" top="78" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="251" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../temp_adc.c" selected="0" top="212" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="94" y="294" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../temp_adc.c" selected="0" top="254" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../temp_adc.h" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="85" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../stroge_data.c" selected="0" top="72" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../stroge_data.h" selected="0" top="0" codecName="Default"/>

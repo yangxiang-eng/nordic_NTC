@@ -40,7 +40,7 @@ bool HT_SensorSelftest(void)
 
   //ÅÐ¶ÏÎÂ¶È·¶Î§ÊÇ·ñÊÇ0~30
   temperatrue /= 1000; 
-  if(temperatrue<0 || temperatrue >30)
+  if(temperatrue<-50 || temperatrue >120)
   {
     return false ; 
   }
@@ -56,7 +56,7 @@ void HT_startMeasure(void)
     return;
   }
 
-  app_timer_start(sensor_timer, APP_TIMER_TICKS(10), NULL);
+  app_timer_start(sensor_timer, APP_TIMER_TICKS(1000), NULL);
 }
 
 static void sensor_timerout_handler()
@@ -73,6 +73,7 @@ static void sensor_timerout_handler()
   float fTemperature = (temperatrue / 1000.0);
   float fHumidity = (humidity / 1000.0);
   gap_ht_measure_callack(0, fTemperature, fHumidity);
+  HT_startMeasure();
 }
 
 void HT_SensorStop()

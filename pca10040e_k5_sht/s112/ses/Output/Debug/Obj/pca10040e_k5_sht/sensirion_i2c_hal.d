@@ -60,4 +60,7 @@ Output/Debug/Obj/pca10040e_k5_sht/sensirion_i2c_hal.o: \
  D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\sensirion_common.h \
  D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\sensirion_config.h \
  D\:/sse/include/stdlib.h \
- D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\sensirion_i2c_hal.h
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\sensirion_i2c_hal.h \
+ ../../../../../../components/boards/boards.h \
+ ../../../../../../modules/nrfx/hal/nrf_gpio.h \
+ ../../../../../../components/boards/pca10040_k5_sht.h

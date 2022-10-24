@@ -1,4 +1,4 @@
-
+#ifdef  PCA1000_ADS1115
 #include "temp_adc.h"
 #include "nrf_drv_saadc.h"
 #include "app_timer.h"
@@ -114,17 +114,30 @@ static void saadc_done_callback(nrf_drv_saadc_evt_t const * p_event)
             app_timer_start(m_temp_timer_id, APP_TIMER_TICKS(1), (void*)ADC_FAILED);
             return;
         }
-
+        #if defined (SAD1115_DIF_mod ) || defined (BOARD_KN5_DIFF_MOD)
         //debug only
+        int tp1Voltage = (p_event->data.done.p_buffer[0] * ADC_REF_VOLTAGE_IN_MILLIVOLTS * ADC_PRE_TP1_COMPENSATION / ADC_RES_14BIT);
+        int tp2Voltage = (p_event->data.done.p_buffer[1] * ADC_REF_VOLTAGE_IN_MILLIVOLTS * 2 * ADC_PRE_TP2_TP1_COMPENSATION_DIFF/ ADC_RES_14BIT);
+        
+        //tp1 / tp2_tp1   ==  R / 10k   ,   tp1*10K / tp2_tp1 == R , tp1 增益1/5    tp2增益1/2   
+        //放大1000倍
+        currentRate = (p_event->data.done.p_buffer[0] * 10000 * 5 ) / (((p_event->data.done.p_buffer[1]) * 4));
+
+         NRF_LOG_INFO("get adc data:%d",p_event->data.done.p_buffer[0]);
+        #endif
+
+        #ifdef  SINGLE_MOD
+
         int tp1Voltage = (p_event->data.done.p_buffer[0] * ADC_REF_VOLTAGE_IN_MILLIVOLTS *ADC_PRE_SCALING_COMPENSATION / ADC_RES_12BIT);
-        int tp2Voltage = (p_event->data.done.p_buffer[1] * ADC_REF_VOLTAGE_IN_MILLIVOLTS * 2 / ADC_RES_12BIT);
+        int tp2Voltage = (p_event->data.done.p_buffer[1] * ADC_REF_VOLTAGE_IN_MILLIVOLTS *ADC_PRE_SCALING_COMPENSATION/ ADC_RES_12BIT);
         
 
         //放大1000倍
-        //currentRate = (p_event->data.done.p_buffer[0] * 10000) / ((p_event->data.done.p_buffer[1])*2);
+        currentRate = (p_event->data.done.p_buffer[0] * 10000) / p_event->data.done.p_buffer[1];
 
-         currentRate = (p_event->data.done.p_buffer[1] * 10000) / (p_event->data.done.p_buffer[0]*2);
-        //NRF_LOG_INFO("current measure result:%d, tp2:%d, tp2_to_tp1:%d, rate:%d\n", gap_shot_data_num, tp1Voltage, tp2Voltage, currentRate);
+        #endif
+
+        NRF_LOG_INFO("current measure result:%d, tp1:%d, tp2:%d, rate:%d\n", gap_shot_data_num, tp1Voltage, tp2Voltage, currentRate);
        
         //check if shot adc complete
         if (gap_shot_data_num < MAX_SHOT_FILTER_NUM)
@@ -172,7 +185,7 @@ static void saadc_driver_start(void)
 {
     ret_code_t err_code;
     nrfx_saadc_config_t adc_config = NRFX_SAADC_DEFAULT_CONFIG;
-    adc_config.resolution = NRF_SAADC_RESOLUTION_12BIT;
+    adc_config.resolution = NRF_SAADC_RESOLUTION_14BIT;
     //adc_config.low_power_mode = true;
 
     err_code = nrf_drv_saadc_init(&adc_config, saadc_done_callback);
@@ -181,12 +194,12 @@ static void saadc_driver_start(void)
     //tp1 channel
 
     
-    
+    #if defined (SAD1115_DIF_mod) || defined (K6PB_DIF_mod) || defined(BOARD_KN5_DIFF_MOD)
     //tp1 channel
     nrf_saadc_channel_config_t tp1_adc =
-    NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(TP2_CH_ADC);
+    NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(TP1_CH_ADC);
     tp1_adc.reference  = SAADC_CH_CONFIG_REFSEL_Internal ; 
-    tp1_adc.gain = NRF_SAADC_GAIN1_4;
+    tp1_adc.gain = NRF_SAADC_GAIN1_5;
     //tp1_adc.acq_time = NRF_SAADC_ACQTIME_40US;
     err_code = nrf_drv_saadc_channel_init(0, &tp1_adc);
     APP_ERROR_CHECK(err_code);
@@ -195,9 +208,27 @@ static void saadc_driver_start(void)
     nrf_saadc_channel_config_t tp2_adc =
     //NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(TP2_CH_ADC);
     NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_DIFFERENTIAL(TP2_CH_ADC,TP1_CH_ADC);
-    tp2_adc.gain = NRF_SAADC_GAIN1;
+    tp2_adc.gain = NRF_SAADC_GAIN1_2;
    
+    #endif
 
+    #ifdef  SINGLE_MOD
+    //tp1 channel
+    nrf_saadc_channel_config_t tp1_adc =
+    NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(TP1_CH_ADC);
+    tp1_adc.reference  = SAADC_CH_CONFIG_REFSEL_Internal ; 
+    tp1_adc.gain = NRF_SAADC_GAIN1_4;
+    //tp1_adc.acq_time = NRF_SAADC_ACQTIME_40US;
+    err_code = nrf_drv_saadc_channel_init(0, &tp1_adc);
+    APP_ERROR_CHECK(err_code);
+    
+    //tp2_to_tp1 channel
+    nrf_saadc_channel_config_t tp2_adc =
+    NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(TP2_CH_ADC);
+    tp2_adc.reference  = SAADC_CH_CONFIG_REFSEL_Internal ; 
+    tp2_adc.gain = NRF_SAADC_GAIN1_4;
+   
+   #endif
 
     err_code = nrf_drv_saadc_channel_init(1, &tp2_adc);
     APP_ERROR_CHECK(err_code);
@@ -227,7 +258,7 @@ static void saadc_driver_stop(void)
     NVIC_ClearPendingIRQ(SAADC_IRQn);
 
     //power off adc
-    nrf_gpio_pin_set(TP_POWER_SWITCH);
+    //nrf_gpio_pin_set(TP_POWER_SWITCH);
     gap_shot_data_num = 0;
     TEMP_ADC_POWER_ON = false ; //表示停止采样
 }
@@ -295,3 +326,4 @@ void Temp_SensorStop(void)
     nrf_gpio_pin_set(TP_POWER_SWITCH);
 }
 
+#endif

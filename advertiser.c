@@ -132,7 +132,7 @@ ret_code_t advertising_init(void)
 //update advertisement content
 extern int16_t adcEddystoneAdvTemp;
 extern int16_t adcEddystoneAdvRes ; 
-#if  defined(BOARD_D62) || defined(K6p_NRF52XX) || defined (PCA1000_ADS1115)
+#if  defined(BOARD_D62) || defined(K6p_NRF52XX) || defined (PCA1000_ADS1115) || defined (BOARD_KN5_V3) || defined (BOARD_PCA10040) || defined(BOARD_K5_SHT)
 static void advertising_update_adv_data(void)
 {
     uint16_t batt;
@@ -201,7 +201,7 @@ static uint32_t advertising_encode_adv_data(void)
     ble_advdata_t m_adv_data;
     ble_advdata_service_data_t m_srv_adv;
     ble_uuid_t    m_eddy_service_uuid;
-#if  defined(BOARD_D62) || defined(K6p_NRF52XX) || defined (PCA1000_ADS1115)
+#if  defined(BOARD_D62) || defined(K6p_NRF52XX) || defined (PCA1000_ADS1115) || defined (BOARD_KN5_V3) || defined (BOARD_PCA10040) || defined (BOARD_K5_SHT)
     kBeaconAdv.frameType = 0x20 ; 
     kBeaconAdv.version = 0 ; 
     #else 

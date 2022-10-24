@@ -19,6 +19,8 @@
 #define ADS1015_REG_POINTER_CONFIG      (0x01)
 #define ADS1015_REG_POINTER_LOWTHRESH   (0x02)
 #define ADS1015_REG_POINTER_HITHRESH    (0x03)
+#define SGM50831_REG_POINTER_CONFIG_1   (0x04)
+#define SGM50831_REG_POINTER_GN_Trim1_EXT_REF (0x6)
 /*-----------------------------------------------------------------------*/
 
 //CONFIG REGISTER
@@ -50,14 +52,14 @@
 #define ADS1015_REG_CONFIG_MODE_CONTIN  (0x0000)  // Continuous conversion mode
 #define ADS1015_REG_CONFIG_MODE_SINGLE  (0x0100)  // Power-down single-shot mode (default)
 
-#define ADS1015_REG_CONFIG_DR_MASK      (0x00E0)  
+#define ADS1015_REG_CONFIG_DR_MASK      (0x00E0)    //800HZ
 #define ADS1015_REG_CONFIG_DR_128SPS    (0x0000)  // 128 samples per second
 #define ADS1015_REG_CONFIG_DR_250SPS    (0x0020)  // 250 samples per second
 #define ADS1015_REG_CONFIG_DR_490SPS    (0x0040)  // 490 samples per second
 #define ADS1015_REG_CONFIG_DR_920SPS    (0x0060)  // 920 samples per second
-#define ADS1015_REG_CONFIG_DR_1600SPS   (0x0080)  // 1600 samples per second (default)
-#define ADS1015_REG_CONFIG_DR_2400SPS   (0x00A0)  // 2400 samples per second
-#define ADS1015_REG_CONFIG_DR_3300SPS   (0x00C0)  // 3300 samples per second
+#define ADS1015_REG_CONFIG_DR_1600SPS   (0x0080)  // 1600 samples per second (default)  100HZ
+#define ADS1015_REG_CONFIG_DR_2400SPS   (0x00A0)  // 2400 samples per second  200HZ
+#define ADS1015_REG_CONFIG_DR_3300SPS   (0x00C0)  // 3300 samples per second 400HZ
 
 #define ADS1015_REG_CONFIG_CMODE_MASK   (0x0010)
 #define ADS1015_REG_CONFIG_CMODE_TRAD   (0x0000)  // Traditional comparator with hysteresis (default)
@@ -78,6 +80,28 @@
 #define ADS1015_REG_CONFIG_CQUE_NONE    (0x0003)  // Disable the comparator and put ALERT/RDY in high state (default)
 /*=========================================================================*/
 
+
+//sgm58031b
+/*==========================================================================*/
+#define SGM58031_REG_CONFIG_DEUFALT (0x0000)
+#define SGM80531_REG_CONFIG_PD      (0x0100)
+#define SGM58031_REG_CONFIG_DR_SEL (0x80)  //IF DR_SER == 0 , MAX SPS = 800HZ , IF DR_SER ==1 , MAX SPS == 960HZ
+#define SGM50831_REG_CONFIG_BURNOUT (0x40)  
+
+#define SGM58031_REG_CONFIG_INT_DIO (0x20) //set adc input 
+
+#define SGM58031_REG_CONFIG_BUS_FLEX (0x10)
+
+#define SGM58031_REG_CONFIG_EXT_REF (0x8)  // set AIN3 to externl ref
+
+/*=========================================================================*/
+
+//sgm58031b if use ext ref
+/*===================================================================*/
+
+  #define SGM58031_REG_GN_TRIM_GAIN (0xAAAA)
+
+/*===================================================================*/
 
 typedef enum
 {

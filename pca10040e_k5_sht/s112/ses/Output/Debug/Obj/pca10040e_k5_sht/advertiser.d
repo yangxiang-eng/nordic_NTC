@@ -91,4 +91,4 @@ Output/Debug/Obj/pca10040e_k5_sht/advertiser.o: \
  ../../../../../../components/softdevice/s112/headers/nrf_soc.h \
  ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
  ../../../../../../components/boards/pca10040_k5_sht.h \
- ../../../../../../components/ble/ble_radio_notification/ble_radio_notification.h
+ D\:\zepyth\nRF5_SDK_17.0.2_d674dde\examples\ble_peripheral\ble_app_blinky_k5\ble_radio_notification.h

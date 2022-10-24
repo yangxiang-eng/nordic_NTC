@@ -1,3 +1,4 @@
+#ifdef  I2C_need
 #include "AccMgr.h"
 #include <nrf_delay.h>
 #include <nrf_drv_twi.h>
@@ -39,13 +40,17 @@ uint8_t Acc_ReadReg(uint8_t addr , uint16_t *buf)
 {
   ret_code_t err_code = 0;
   uint8_t readAddr[] = {addr};
+//IF ADDR == VDD
+  //err_code = nrf_drv_twi_tx(&m_twi, ADS1115_ADDRESS, readAddr, 1, true);
+  //IF ADDR == GND
+  err_code = nrf_drv_twi_tx(&m_twi,ADS1015_ADDRESS,readAddr,1,true);
 
-  err_code = nrf_drv_twi_tx(&m_twi, ADS1115_ADDRESS, readAddr, 1, true);
   APP_ERROR_CHECK(err_code);
   
   uint8_t storge_buf_data[2];
-  err_code = nrf_drv_twi_rx(&m_twi, ADS1115_ADDRESS, storge_buf_data, 2);
-
+  //IF ADDR == VDD
+  //err_code = nrf_drv_twi_rx(&m_twi, ADS1115_ADDRESS, storge_buf_data, 2);
+  err_code = nrf_drv_twi_rx(&m_twi, ADS1015_ADDRESS, storge_buf_data, 2);
   *buf = storge_buf_data[0]<<8;
   *buf += storge_buf_data[1];
 
@@ -60,9 +65,12 @@ uint8_t Acc_WriteReg(uint8_t addr, uint16_t buf)
   txBuf[0] = addr ;
   txBuf[1] = (uint8_t)(buf>>8);
   txBuf[2] = (uint8_t)(buf & 0xFF);
-
-  ret_code_t err_code = nrf_drv_twi_tx(&m_twi, ADS1115_ADDRESS, txBuf, sizeof(txBuf), true);
+//IF ADDR == VDD
+  //ret_code_t err_code = nrf_drv_twi_tx(&m_twi, ADS1115_ADDRESS, txBuf, sizeof(txBuf), true);
+  ret_code_t err_code = nrf_drv_twi_tx(&m_twi, ADS1015_ADDRESS, txBuf, sizeof(txBuf), true);
   APP_ERROR_CHECK(err_code);
 
   return true;
 }
+
+#endif

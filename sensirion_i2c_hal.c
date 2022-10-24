@@ -37,13 +37,12 @@
 #include "sensirion_common.h"
 #include "sensirion_config.h"
 #include "sensirion_i2c_hal.h"
-
+#include "boards.h"
 /**
  * Nordic specific configuration. Change the pin numbers if you use other pins
  * than defined below.
  */
-#define SENSIRION_SDA_PIN 28
-#define SENSIRION_SCL_PIN 25
+
 
 /**
  * Create new TWI instance. You may also use a different interface. In this
@@ -59,8 +58,8 @@ static const nrf_drv_twi_t i2c_instance = NRF_DRV_TWI_INSTANCE(0);
  */
 void sensirion_i2c_hal_init(void) {
     int8_t err;
-    const nrf_drv_twi_config_t i2c_instance_config = {.scl = SENSIRION_SCL_PIN,
-                                                      .sda = SENSIRION_SDA_PIN,
+    const nrf_drv_twi_config_t i2c_instance_config = {.scl = ARDUINO_SCL_PIN,
+                                                      .sda = ARDUINO_SDA_PIN,
                                                       .frequency =
                                                           NRF_TWI_FREQ_100K,
                                                       .interrupt_priority = 0};

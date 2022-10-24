@@ -60,7 +60,7 @@ typedef struct
 #define LO_UINT16(a) ((a) & 0xFF)
 #define BREAK_UINT32( var, ByteNum )  (uint8_t)((uint32_t)(((var) >>((ByteNum) * 8)) & 0x00FF))
 
-#if defined(BOARD_D62) || defined(K6p_NRF52XX) || defined (PCA1000_ADS1115)
+#if defined(BOARD_D62) || defined(K6p_NRF52XX) || defined (PCA1000_ADS1115) || defined(BOARD_KN5_V3) || defined (BOARD_PCA10040) || defined (BOARD_K5_SHT)
 typedef struct
 {
     uint8_t   frameType;      // TLM
